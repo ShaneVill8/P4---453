@@ -60,3 +60,158 @@ int writeBlock(int disk, int bNum, void *block){
 int closeDisk(int disk){
 	return close(disk);
 }
+
+
+/* Phase 2 Functions */
+/* Makes blank filesystem of nBytes size on specified file */
+int tfs_mkfs(char *filename, int nBytes)
+{
+   //
+   return -1;
+}
+
+/* Mounts a file system to the given file */
+int tfs_mount(char *filename)
+{
+   //
+   return -1;
+}
+
+/* Unmounts the currently mounted file system */
+int tfs_unmount()
+{
+   //
+   return -1;
+}
+
+/* Opens a file for reading and writing on currently mounted file system */
+int tfs_openFile(char *name)
+{
+   //
+   return -1;
+}
+
+/* Close file, de-allocate resources, remove table entry */
+int tfs_closeFile(int FD)
+{
+   //
+   return -1;
+}
+
+/* Writes buffer to the file starting at position 0 in the file */
+int tfs_writeFile(int FD, char *buffer, int size)
+{
+   //
+   return -1;
+}
+
+/* Deletes a file and marks its blocks as free on disk */
+int tfs_deleteFile(int FD)
+{
+   //
+   return -1;
+}
+
+/* Reads one byte from the file and copies it to the buffer */
+int tfs_readByte(int FD, char *buffer)
+{
+   //
+   return -1;
+}
+
+/* Changes the file pointer location to offset */
+int tfs_seek(int FD, int offset)
+{
+   //
+   return -1;
+}
+
+
+/* End Phase 2 functions */
+
+
+/* Linked List Functions */
+/* Inserts the node at the end of the given linked list */
+void insertEndLinkedList(struct node *node, struct linked_List *list)
+{
+   if (list->size == 0)
+   {
+      list->head = node;
+      list->tail = node;
+      list->tail->next = NULL;
+      list->size++;
+   }
+   else
+   {
+      list->tail->next = node;
+      list->tail = node;
+      list->size++;
+      list->tail->next = NULL;
+   }
+}
+
+/* Inserts the node to the front of the given linked list */
+void insertFrontLinkedList(struct node *node, struct linked_List *list)
+{
+   if (list->size == 0) // The new node is the head and the tail
+   {
+      list->head = node;
+      list->tail = node;
+      list->tail->next = NULL;
+      list->size++;
+   }
+   else
+   {
+      node->next = list->head;
+      list->head = node;
+      list->size++;
+   }
+}
+
+/* Removes the head from the given linked list */
+void removeHeadLinkedList(struct linked_List *list)
+{
+   struct node *tmp;
+   if (list->size == 1)
+   {
+      tmp = list->head; 
+      list->head = NULL;
+      list->tail = NULL;
+      list->size--;
+      free(tmp); 
+   }
+   else if (list->size > 0)
+   {
+      tmp = list->head; 
+      list->head = list->head->next;
+      list->size--;
+      free(tmp);
+   }
+}
+
+/* Removes the tail from the given linked list */
+void removeTailLinkedList(struct linked_List *list)
+{
+   struct node *tmp;
+   if (list->size == 1)
+   {
+      tmp = list->head; 
+      list->head = NULL;
+      list->tail = NULL;
+      list->size--;
+      free(tmp); 
+   }
+   else if (list->size > 0)
+   {
+      tmp = list->head; 
+      while (tmp->next->next != NULL)
+      {
+         tmp = tmp->next;
+      }
+      list->tail = tmp;
+      list->size--;
+      free(tmp->next);
+      tmp->next = NULL;
+   }
+}
+/* End Linked List functions */

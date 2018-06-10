@@ -8,6 +8,9 @@
 
 #include "libDisk.h"
 
+char block[BLOCKSIZE];
+char* MFS = NULL;
+
 int openDisk(char *filename, int nBytes){
 	int fd, i;
 	char buffer[nBytes];
@@ -64,24 +67,92 @@ int closeDisk(int disk){
 
 /* Phase 2 Functions */
 /* Makes blank filesystem of nBytes size on specified file */
-int tfs_mkfs(char *filename, int nBytes)
-{
-   //
-   return -1;
+int tfs_mkfs(char *filename, int nBytes){
+
+   int numBlocks;
+   int i;
+   int diskNum = openDisk(filename, nBytes);
+   if (diskNum < 0){
+      return -1;
+   }
+   for (i = 0; i < BLOCKSIZE; i++) {
+      block[i] = 0x00;
+   }
+
+   block[0] = 1;
+   block[1] = 0x45;
+   block[2] = 1;
+
+   if (writeBlock(diskNum, 0, block) == -1){
+      return -1; //error
+   }
+
+   for (i = 0; i < BLOCKSIZE; i++) {
+      block[i] = 0x00;
+   }
+
+   block[0] = 2;
+   block[1] = 0x45;
+   block[2] = 2;
+
+   if(writeBlock(diskNum, 1, block) == -1){
+      return -1; //error
+   }
+
+   numBlocks = nBytes/BLOCKSIZE;
+
+   for(i = 3; i < numBlocks; i++){
+
+      for(j = 0; j < BLOCKSIZE; j++){
+         block[j] = 0x00;
+      }
+
+      block[0] = 4;
+      block[1] = 0x45;
+      block[2] = j;
+
+      if(writeBlock(diskNum, i-1, block) == -1){
+         return -1; //error
+      }
+   }
+
+   for (i = 0; i < BLOCKSIZE; i++) {
+      block[i] = 0x00;
+   }
+
+   block[0] = 4;
+   block[1] = 0x45;
+   block[2] = 0;
+
+   if(writeBlock(diskNum, numBlocks-1, block) == -1){
+      return -1; //error
+   }
+
+   return 0;
 }
 
 /* Mounts a file system to the given file */
-int tfs_mount(char *filename)
-{
-   //
-   return -1;
+int tfs_mount(char *filename){
+   char buffer[BLOCKSIZE];
+   int diskNum;
+
+   diskNum = openDisk(filename, 0);
+   if(readBlock(diskNum, 0, buffer) == -1){
+      return -1;
+   }
+
+   if (buffer[1] != 0x45){
+      return UNKOWN_FS;
+   }
+
+   MFS = filename;
+   return 0;
 }
 
 /* Unmounts the currently mounted file system */
-int tfs_unmount()
-{
-   //
-   return -1;
+int tfs_unmount(){
+   MFS = NULL;
+   return 1;
 }
 
 /* Opens a file for reading and writing on currently mounted file system */
